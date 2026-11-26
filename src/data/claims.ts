@@ -47,7 +47,7 @@ export const CLAIMS_DATA: ClaimCaseStudy[] = [
     ticker: 'PWR-POSE',
     shortTitle: 'Power Posing & Testosterone',
     headline:
-      'Holding expansive "power poses" for 2 minutes boosts testosterone, lowers cortisol, and increases risk tolerance.',
+      'Holding expansive “power poses” for 2 minutes boosts testosterone, lowers cortisol, and increases risk tolerance.',
     field: 'Psychology',
     status: 'failed-replication',
     statusLabel: 'Failed Replication',

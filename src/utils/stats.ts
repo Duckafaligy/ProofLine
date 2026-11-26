@@ -134,3 +134,12 @@ export function formatPValue(p: number): string {
   if (p < 0.001) return `p = ${p.toFixed(4)}`;
   return `p = ${p.toFixed(3)}`;
 }
+
+const SAMPLE_SIZE_FORMATTER = new Intl.NumberFormat('en-US');
+
+/**
+ * Formats integer sample sizes consistently via Intl.NumberFormat.
+ */
+export function formatSampleSize(n: number): string {
+  return SAMPLE_SIZE_FORMATTER.format(Math.round(n));
+}

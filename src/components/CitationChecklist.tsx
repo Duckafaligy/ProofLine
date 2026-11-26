@@ -10,92 +10,134 @@ interface CitationChecklistProps {
 }
 
 export function CitationChecklist({
+  claimId,
   items,
   checkedIds,
   onToggleItem,
 }: CitationChecklistProps) {
-  const [expandedId, setExpandedId] = useState<string | null>(items[0]?.id ?? null);
+  const [expandedId, setExpandedId] = useState<string | null>(
+    items[0]?.id ?? null
+  );
 
-  const completedCount = items.filter((item) => Boolean(checkedIds[item.id])).length;
+  const completedCount = items.filter((item) =>
+    Boolean(checkedIds[item.id])
+  ).length;
   const allComplete = completedCount === items.length && items.length > 0;
 
   return (
     <section
-      aria-label="3 Questions Before You Cite This"
+      aria-labelledby={`checklist-heading-${claimId}`}
       className="hairline-card rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-100 pb-5">
-        <div>
-          <h2 className="text-lg font-bold tracking-[-0.02em] text-zinc-950">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-100 pb-6">
+        <div className="min-w-0">
+          <h2
+            id={`checklist-heading-${claimId}`}
+            className="text-balance text-lg font-bold tracking-[-0.02em] text-zinc-950"
+          >
             3 Questions Before You Cite This
           </h2>
-          <p className="mt-0.5 text-sm text-zinc-500">
+          <p className="mt-1 text-pretty text-sm text-zinc-600">
             Student verification audit before quoting this study in a paper
           </p>
         </div>
 
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono-tabular text-xs font-semibold ${
+          role="status"
+          aria-live="polite"
+          className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1 font-mono-tabular text-xs font-semibold ${
             allComplete
-              ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-              : 'border-zinc-200 bg-zinc-50 text-zinc-600'
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+              : 'border-zinc-200 bg-zinc-50 text-zinc-700'
           }`}
         >
-          {allComplete && <CheckCircle2 className="h-3.5 w-3.5" />}
+          {allComplete && (
+            <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          )}
           {completedCount}/{items.length} Audited
         </span>
       </div>
 
-      <div className="mt-5 divide-y divide-zinc-200">
-        {items.map((item, idx) => {
-          const isChecked = Boolean(checkedIds[item.id]);
-          const isExpanded = expandedId === item.id;
+      {items.length === 0 ? (
+        <p className="mt-5 text-sm text-zinc-600">
+          No citation checklist items available for this claim.
+        </p>
+      ) : (
+        <div className="mt-6 divide-y divide-zinc-200">
+          {items.map((item, idx) => {
+            const isChecked = Boolean(checkedIds[item.id]);
+            const isExpanded = expandedId === item.id;
+            const inputId = `check-${claimId}-${item.id}`;
+            const panelId = `evidence-${claimId}-${item.id}`;
 
-          return (
-            <div key={item.id} className="py-4 first:pt-0 last:pb-0">
-              <div className="flex items-start gap-3.5">
-                <input
-                  id={`check-${item.id}`}
-                  type="checkbox"
-                  checked={isChecked}
-                  onChange={() => onToggleItem(item.id)}
-                  className="mt-1 h-4 w-4 shrink-0 cursor-pointer rounded border-zinc-300 accent-zinc-950"
-                />
-                <div className="min-w-0 flex-1">
+            return (
+              <div key={item.id} className="py-5 first:pt-0 last:pb-0">
+                <div className="flex items-start justify-between gap-4">
                   <label
-                    htmlFor={`check-${item.id}`}
-                    className={`block cursor-pointer text-sm font-semibold ${
-                      isChecked ? 'text-zinc-400 line-through' : 'text-zinc-950'
-                    }`}
+                    htmlFor={inputId}
+                    className="-m-1.5 flex min-w-0 flex-1 cursor-pointer items-start gap-3.5 rounded-lg p-1.5 transition-colors duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-zinc-50"
                   >
-                    <span className="mr-2 font-mono-tabular text-xs text-zinc-400">
-                      0{idx + 1}.
+                    <input
+                      id={inputId}
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => onToggleItem(item.id)}
+                      className="mt-1 h-4 w-4 shrink-0 cursor-pointer rounded border-zinc-300 accent-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span
+                        className={`block text-sm font-semibold leading-snug ${
+                          isChecked
+                            ? 'text-zinc-500 line-through'
+                            : 'text-zinc-950'
+                        }`}
+                      >
+                        <span className="mr-2 font-mono-tabular text-xs text-zinc-500">
+                          0{idx + 1}.
+                        </span>
+                        {item.question}
+                      </span>
+                      <span className="mt-1.5 block text-xs leading-relaxed text-zinc-600">
+                        {item.hint}
+                      </span>
                     </span>
-                    {item.question}
                   </label>
-                  <p className="mt-1 text-xs text-zinc-500">{item.hint}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setExpandedId(isExpanded ? null : item.id)}
-                  aria-expanded={isExpanded}
-                  className="inline-flex shrink-0 items-center gap-1 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-600 hover:border-zinc-400 hover:text-zinc-950"
-                >
-                  Evidence
-                  {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-                </button>
-              </div>
 
-              {isExpanded && (
-                <div className="mt-3 ml-7 rounded-lg bg-zinc-50 p-3.5 text-xs leading-relaxed text-zinc-700">
-                  <span className="mr-1.5 font-semibold text-zinc-950">Audit Finding:</span>
-                  {item.evidenceAnswer}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setExpandedId(isExpanded ? null : item.id)
+                    }
+                    aria-expanded={isExpanded}
+                    aria-controls={panelId}
+                    aria-label={`${isExpanded ? 'Hide' : 'Show'} evidence for question ${idx + 1}`}
+                    className="inline-flex shrink-0 items-center gap-1 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-medium text-zinc-700 transition-[background-color,border-color,color,transform] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-zinc-400 hover:text-zinc-950 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
+                  >
+                    Evidence
+                    {isExpanded ? (
+                      <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" />
+                    ) : (
+                      <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+                    )}
+                  </button>
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+
+                {isExpanded && (
+                  <div
+                    id={panelId}
+                    className="mt-4 ml-7 rounded-xl border border-zinc-200/80 bg-zinc-50/80 p-4 text-[13px] leading-relaxed text-zinc-700"
+                  >
+                    <span className="mr-1.5 font-semibold text-zinc-950">
+                      Audit Finding:
+                    </span>
+                    {item.evidenceAnswer}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }
