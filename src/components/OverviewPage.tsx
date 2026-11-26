@@ -80,14 +80,14 @@ export function OverviewPage({ onOpenLab }: OverviewPageProps) {
 
         <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
           <a
-            href="?view=lab"
+            href="?view=dashboard"
             onClick={(e) => {
               e.preventDefault();
               onOpenLab();
             }}
             className="inline-flex items-center gap-2 rounded-full bg-zinc-950 px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
           >
-            Open Stress-Test Lab
+            Check out Dashboard
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </a>
 
@@ -95,7 +95,7 @@ export function OverviewPage({ onOpenLab }: OverviewPageProps) {
             href="#case-studies"
             className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-6 py-3.5 text-sm font-semibold text-zinc-800 transition-colors hover:border-zinc-400 hover:text-zinc-950"
           >
-            Browse All 6 Audits
+            Browse All 6 Case Studies
           </a>
         </div>
       </section>
@@ -114,7 +114,7 @@ export function OverviewPage({ onOpenLab }: OverviewPageProps) {
             onClick={() => onOpenLab(featured.id)}
             className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-900 hover:underline"
           >
-            Open full stress-test for {featured.shortTitle}
+            Open {featured.shortTitle} in Dashboard
             <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
         </div>
@@ -153,7 +153,7 @@ export function OverviewPage({ onOpenLab }: OverviewPageProps) {
               />
               <figcaption className="flex items-center justify-between border-t border-zinc-200 bg-white px-4 py-2.5 font-mono-tabular text-xs text-zinc-500">
                 <span>Replication Audit Protocol</span>
-                <span>Wikimedia Commons · CC BY-SA</span>
+                <span>Wikimedia Commons · CC BY 2.0</span>
               </figcaption>
             </figure>
           </div>
@@ -180,7 +180,7 @@ export function OverviewPage({ onOpenLab }: OverviewPageProps) {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <StatusBadge status="failed-replication" label="Failed Replication" size="md" />
                 <span className="font-mono-tabular text-xs text-zinc-500">
-                  Example: Power Posing (N = 42 → N = 200 · p = 0.68)
+                  Example: Power Posing (N = 42 → N = 9,779 · g = 0.0)
                 </span>
               </div>
               <h3 className="mt-3 text-base font-bold text-zinc-950">
@@ -257,7 +257,7 @@ export function OverviewPage({ onOpenLab }: OverviewPageProps) {
             <div className="col-span-2">Status</div>
             <div className="col-span-2">Original Study</div>
             <div className="col-span-2">Latest Consensus</div>
-            <div className="col-span-1 text-right">Lab</div>
+            <div className="col-span-1 text-right">Open</div>
           </div>
 
           <div className="divide-y divide-zinc-200">
@@ -269,7 +269,7 @@ export function OverviewPage({ onOpenLab }: OverviewPageProps) {
               return (
                 <a
                   key={claim.id}
-                  href={`?view=lab&claim=${claim.id}`}
+                  href={`?view=dashboard&claim=${claim.id}`}
                   onClick={(e) => {
                     e.preventDefault();
                     onOpenLab(claim.id);
@@ -463,14 +463,14 @@ export function OverviewPage({ onOpenLab }: OverviewPageProps) {
           </p>
         </div>
         <a
-          href="?view=lab"
+          href="?view=dashboard"
           onClick={(e) => {
             e.preventDefault();
             onOpenLab();
           }}
           className="inline-flex shrink-0 items-center gap-2 rounded-full bg-zinc-950 px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
         >
-          Launch Stress-Test Lab
+          Check out Dashboard
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </a>
       </section>

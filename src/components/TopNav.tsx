@@ -1,5 +1,5 @@
-import type { MouseEvent } from 'react';
-import { ArrowRight, Eye, FlaskConical, Volume2, VolumeX } from 'lucide-react';
+import { useEffect, useState, type MouseEvent } from 'react';
+import { ArrowLeft, ArrowRight, Menu, Type, Volume2, VolumeX, X } from 'lucide-react';
 
 export type AppView = 'overview' | 'lab';
 
@@ -7,13 +7,22 @@ interface TopNavProps {
   activeView: AppView;
   selectedClaimId?: string;
   onChangeView: (view: AppView) => void;
-  onJumpToSection?: (sectionId: string) => void;
+  onJumpToSection: (sectionId: string) => void;
   hyperlegible: boolean;
   onToggleHyperlegible: () => void;
   isSpeaking: boolean;
   speechSupported: boolean;
   onToggleSpeech: () => void;
 }
+
+const SECTION_LINKS = [
+  { id: 'live-preview', label: 'Why Claims Shift' },
+  { id: 'provenance', label: 'How We Label' },
+  { id: 'case-studies', label: 'Case Studies' },
+  { id: 'methodology', label: 'Methodology' },
+];
+
+const GITHUB_URL = 'https://github.com/Duckafaligy/ProofLine';
 
 function isPlainLeftClick(event: MouseEvent<HTMLAnchorElement>): boolean {
   return (
@@ -22,6 +31,25 @@ function isPlainLeftClick(event: MouseEvent<HTMLAnchorElement>): boolean {
     !event.ctrlKey &&
     !event.shiftKey &&
     !event.altKey
+  );
+}
+
+const ICON_BTN =
+  'inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:opacity-40';
+
+function Logo() {
+  return (
+    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950 text-white">
+      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
+        <path
+          d="M3 15L8 9L12.5 13.5L17.5 6.5L21 11"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </div>
   );
 }
 
@@ -36,190 +64,202 @@ export function TopNav({
   speechSupported,
   onToggleSpeech,
 }: TopNavProps) {
-  const labHref = selectedClaimId
-    ? `?view=lab&claim=${encodeURIComponent(selectedClaimId)}`
-    : '?view=lab';
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const isDashboard = activeView === 'lab';
 
-  const handleViewClick =
-    (view: AppView) => (event: MouseEvent<HTMLAnchorElement>) => {
-      if (!isPlainLeftClick(event)) return;
-      event.preventDefault();
-      onChangeView(view);
-    };
+  const dashboardHref = selectedClaimId
+    ? `?view=dashboard&claim=${encodeURIComponent(selectedClaimId)}`
+    : '?view=dashboard';
 
-  const handleSectionClick =
-    (sectionId: string) => (event: MouseEvent<HTMLAnchorElement>) => {
-      if (!isPlainLeftClick(event)) return;
-      event.preventDefault();
-      if (onJumpToSection) {
-        onJumpToSection(sectionId);
-      } else {
-        onChangeView('overview');
-        setTimeout(() => {
-          document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
-        }, 40);
-      }
-    };
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMenuOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [menuOpen]);
+
+  const goView = (view: AppView) => (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!isPlainLeftClick(event)) return;
+    event.preventDefault();
+    setMenuOpen(false);
+    onChangeView(view);
+  };
+
+  const goSection = (id: string) => (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!isPlainLeftClick(event)) return;
+    event.preventDefault();
+    setMenuOpen(false);
+    onJumpToSection(id);
+  };
+
+  const utilityButtons = (
+    <>
+      <button
+        type="button"
+        onClick={onToggleHyperlegible}
+        aria-pressed={hyperlegible}
+        aria-label={hyperlegible ? 'Turn off Hyperlegible mode' : 'Turn on Hyperlegible mode'}
+        title="Hyperlegible reading mode"
+        className={`${ICON_BTN} ${
+          hyperlegible
+            ? 'border-zinc-950 bg-zinc-950 text-white'
+            : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 hover:text-zinc-950'
+        }`}
+      >
+        <Type className="h-4 w-4" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        onClick={onToggleSpeech}
+        disabled={!speechSupported}
+        aria-pressed={isSpeaking}
+        aria-label={isSpeaking ? 'Stop audio brief' : 'Play audio brief'}
+        title={isSpeaking ? 'Stop audio brief' : 'Play audio brief'}
+        className={`${ICON_BTN} ${
+          isSpeaking
+            ? 'border-emerald-700 bg-emerald-50 text-emerald-900'
+            : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 hover:text-zinc-950'
+        }`}
+      >
+        {isSpeaking ? (
+          <VolumeX className="h-4 w-4" aria-hidden="true" />
+        ) : (
+          <Volume2 className="h-4 w-4" aria-hidden="true" />
+        )}
+      </button>
+    </>
+  );
 
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-200/90 bg-white/95 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-6">
-        {/* Left: Brand + Primary Section Links */}
-        <div className="flex items-center gap-8">
-          <a
-            href="?view=overview"
-            onClick={handleViewClick('overview')}
-            aria-label="ProofLine home"
-            className="group flex items-center gap-2.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950 text-white transition-transform duration-200 group-hover:scale-[1.03]">
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
-                <path
-                  d="M3 15L8 9L12.5 13.5L17.5 6.5L21 11"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span
-                translate="no"
-                className="text-base font-bold tracking-[-0.04em] text-zinc-950"
-              >
-                ProofLine
-              </span>
-              <span className="hidden font-mono-tabular text-[11px] font-medium text-zinc-400 sm:inline">
-                v2.6
-              </span>
-            </div>
-          </a>
+    <header
+      className={`sticky top-0 z-40 border-b bg-white/90 backdrop-blur-md transition-[border-color,box-shadow] duration-200 ${
+        scrolled ? 'border-zinc-200 shadow-[0_1px_0_rgba(9,9,11,0.02)]' : 'border-transparent'
+      }`}
+    >
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-6">
+        {/* Brand */}
+        <a
+          href="?"
+          onClick={goView('overview')}
+          aria-label="ProofLine home"
+          className="flex shrink-0 items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
+        >
+          <Logo />
+          <span translate="no" className="text-base font-bold tracking-[-0.04em] text-zinc-950">
+            ProofLine
+          </span>
+          {isDashboard && (
+            <span className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[11px] font-semibold text-zinc-700">
+              Dashboard
+            </span>
+          )}
+        </a>
 
-          {/* Editorial Navigation Links */}
-          <nav aria-label="Main navigation" className="hidden items-center gap-6 lg:flex">
+        {/* Center: marketing links (landing only) */}
+        {!isDashboard && (
+          <nav aria-label="Main" className="hidden flex-1 items-center justify-center gap-7 lg:flex">
+            {SECTION_LINKS.map((link) => (
+              <a
+                key={link.id}
+                href={`#${link.id}`}
+                onClick={goSection(link.id)}
+                className="text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-950"
+              >
+                {link.label}
+              </a>
+            ))}
             <a
-              href="#live-preview"
-              onClick={handleSectionClick('live-preview')}
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noreferrer"
               className="text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-950"
             >
-              Why Claims Shift
-            </a>
-            <a
-              href="#provenance"
-              onClick={handleSectionClick('provenance')}
-              className="text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-950"
-            >
-              How We Label
-            </a>
-            <a
-              href="#case-studies"
-              onClick={handleSectionClick('case-studies')}
-              className="text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-950"
-            >
-              6 Case Studies
-            </a>
-            <a
-              href="#methodology"
-              onClick={handleSectionClick('methodology')}
-              className="text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-950"
-            >
-              Methodology
+              GitHub
             </a>
           </nav>
-        </div>
+        )}
 
-        {/* Right: View Switcher + A11y Utilities + Primary CTA */}
-        <div className="flex items-center gap-2.5">
-          {/* Segmented View Pill */}
-          <div
-            role="group"
-            aria-label="Switch view"
-            className="flex items-center rounded-full border border-zinc-200 bg-zinc-100/90 p-0.5"
-          >
+        {/* Right */}
+        <div className="flex shrink-0 items-center gap-2">
+          <div className="hidden items-center gap-2 sm:flex">{utilityButtons}</div>
+
+          {isDashboard ? (
             <a
-              href="?view=overview"
-              onClick={handleViewClick('overview')}
-              aria-current={activeView === 'overview' ? 'page' : undefined}
-              className={`rounded-full px-3.5 py-1 text-xs font-semibold transition-all ${
-                activeView === 'overview'
-                  ? 'bg-white text-zinc-950 shadow-xs'
-                  : 'text-zinc-600 hover:text-zinc-950'
-              }`}
+              href="?"
+              onClick={goView('overview')}
+              className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-800 transition-colors hover:border-zinc-400 hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
             >
-              Landing
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              Back to site
             </a>
+          ) : (
             <a
-              href={labHref}
-              onClick={handleViewClick('lab')}
-              aria-current={activeView === 'lab' ? 'page' : undefined}
-              className={`inline-flex items-center gap-1 rounded-full px-3.5 py-1 text-xs font-semibold transition-all ${
-                activeView === 'lab'
-                  ? 'bg-white text-zinc-950 shadow-xs'
-                  : 'text-zinc-600 hover:text-zinc-950'
-              }`}
+              href={dashboardHref}
+              onClick={goView('lab')}
+              className="hidden items-center gap-1.5 rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 sm:inline-flex"
             >
-              <FlaskConical className="h-3 w-3" aria-hidden="true" />
-              Lab
+              Check out Dashboard
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>
-          </div>
+          )}
 
-          <div className="hidden h-4 w-px bg-zinc-200 sm:block" aria-hidden="true" />
-
-          {/* Hyperlegible Toggle */}
-          <button
-            type="button"
-            onClick={onToggleHyperlegible}
-            aria-pressed={hyperlegible}
-            title="Toggle Atkinson Hyperlegible High-Contrast Mode"
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 ${
-              hyperlegible
-                ? 'border-zinc-950 bg-zinc-950 text-white'
-                : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 hover:text-zinc-950'
-            }`}
-          >
-            <Eye className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            <span className="hidden xl:inline">
-              {hyperlegible ? 'Hyperlegible: ON' : 'Aa Hyperlegible'}
-            </span>
-          </button>
-
-          {/* Neural Audio Readout */}
-          <button
-            type="button"
-            onClick={onToggleSpeech}
-            disabled={!speechSupported}
-            aria-pressed={isSpeaking}
-            title="Play Studio Neural Audio Summary"
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:opacity-40 ${
-              isSpeaking
-                ? 'border-emerald-700 bg-emerald-50 text-emerald-900'
-                : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 hover:text-zinc-950'
-            }`}
-          >
-            {isSpeaking ? (
-              <VolumeX className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            ) : (
-              <Volume2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            )}
-            <span className="hidden sm:inline">
-              {isSpeaking ? 'Stop Audio' : 'Audio Brief'}
-            </span>
-          </button>
-
-          {/* Primary Action Button */}
-          {activeView === 'overview' && (
-            <a
-              href={labHref}
-              onClick={handleViewClick('lab')}
-              className="hidden items-center gap-1.5 rounded-full bg-zinc-950 px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-zinc-800 md:inline-flex"
+          {!isDashboard && (
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-menu"
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              className={`${ICON_BTN} border-zinc-200 bg-white text-zinc-800 lg:hidden`}
             >
-              Open Lab
-              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-            </a>
+              {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            </button>
           )}
         </div>
       </div>
+
+      {/* Mobile menu */}
+      {!isDashboard && menuOpen && (
+        <div id="mobile-menu" className="border-t border-zinc-200 bg-white lg:hidden">
+          <nav aria-label="Mobile" className="mx-auto flex max-w-7xl flex-col px-6 py-4">
+            {SECTION_LINKS.map((link) => (
+              <a
+                key={link.id}
+                href={`#${link.id}`}
+                onClick={goSection(link.id)}
+                className="border-b border-zinc-100 py-3 text-base font-medium text-zinc-800"
+              >
+                {link.label}
+              </a>
+            ))}
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="border-b border-zinc-100 py-3 text-base font-medium text-zinc-800"
+            >
+              GitHub
+            </a>
+            <div className="mt-4 flex items-center gap-2">{utilityButtons}</div>
+            <a
+              href={dashboardHref}
+              onClick={goView('lab')}
+              className="mt-4 inline-flex items-center justify-center gap-1.5 rounded-full bg-zinc-950 px-5 py-3 text-sm font-semibold text-white"
+            >
+              Check out Dashboard
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

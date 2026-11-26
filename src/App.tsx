@@ -9,7 +9,9 @@ function readUrlState(): { view: AppView; claimId: string } {
     return { view: 'overview', claimId: CLAIMS_DATA[0].id };
   }
   const params = new URLSearchParams(window.location.search);
-  const view: AppView = params.get('view') === 'lab' ? 'lab' : 'overview';
+  const viewParam = params.get('view');
+  const view: AppView =
+    viewParam === 'dashboard' || viewParam === 'lab' ? 'lab' : 'overview';
   const claimParam = params.get('claim');
   const matched = CLAIMS_DATA.find((c) => c.id === claimParam);
   return {
@@ -64,7 +66,7 @@ export function App() {
       url.searchParams.delete('view');
       url.searchParams.delete('claim');
     } else {
-      url.searchParams.set('view', 'lab');
+      url.searchParams.set('view', 'dashboard');
       url.searchParams.set('claim', claimId);
     }
     window.history.pushState({}, '', url);
@@ -278,7 +280,7 @@ export function App() {
                     onClick={() => handleOpenLab()}
                     className="hover:text-zinc-950"
                   >
-                    Stress-Test Lab
+                    Check out Dashboard
                   </button>
                 </li>
               </ul>
@@ -349,7 +351,7 @@ export function App() {
               © 2026 ProofLine · Built for the STEM Innovation Challenge 2026
             </span>
             <span>
-              Lab photography via Wikimedia Commons (CC BY-SA 4.0) · Neural TTS Audio
+              Lab photography via Wikimedia Commons (CC BY 4.0 / 2.0) · Neural TTS Audio
             </span>
           </div>
         </div>

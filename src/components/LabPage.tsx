@@ -199,27 +199,32 @@ export function LabPage({
       {/* Top Sub-Navbar: Breadcrumb + Horizontal Case Study Switcher */}
       <div className="flex flex-col gap-4 border-b border-zinc-200 pb-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-xs font-medium text-zinc-500">
-            {onBackToOverview && (
-              <button
-                type="button"
-                onClick={onBackToOverview}
-                className="inline-flex items-center gap-1 font-semibold text-zinc-700 hover:text-zinc-950"
-              >
-                <ArrowLeft className="h-3.5 w-3.5" />
-                Landing
-              </button>
-            )}
-            <span>/</span>
-            <span>Stress-Test Lab</span>
-            <span>/</span>
-            <span className="font-mono-tabular font-semibold text-zinc-950">
-              {selectedClaim.ticker}
-            </span>
+          <div>
+            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-zinc-500">
+              {onBackToOverview && (
+                <button
+                  type="button"
+                  onClick={onBackToOverview}
+                  className="inline-flex items-center gap-1 font-semibold text-zinc-700 hover:text-zinc-950"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+                  Home
+                </button>
+              )}
+              <span aria-hidden="true">/</span>
+              <span>Dashboard</span>
+              <span aria-hidden="true">/</span>
+              <span className="font-mono-tabular font-semibold text-zinc-950">
+                {selectedClaim.ticker}
+              </span>
+            </nav>
+            <h2 className="mt-2 text-2xl font-bold tracking-[-0.03em] text-zinc-950">
+              Evidence Dashboard
+            </h2>
           </div>
 
-          <span className="font-mono-tabular text-xs text-zinc-500">
-            Select any case study below to switch workbench
+          <span className="text-sm text-zinc-500">
+            Pick a case study to load it into the workbench.
           </span>
         </div>
 
@@ -235,7 +240,7 @@ export function LabPage({
             return (
               <a
                 key={claim.id}
-                href={`?view=lab&claim=${encodeURIComponent(claim.id)}`}
+                href={`?view=dashboard&claim=${encodeURIComponent(claim.id)}`}
                 onClick={(event) => {
                   if (!isPlainLeftClick(event)) return;
                   event.preventDefault();
