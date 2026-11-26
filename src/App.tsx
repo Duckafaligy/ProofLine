@@ -151,6 +151,19 @@ export function App() {
     scrollToTop();
   };
 
+  const handleJumpToSection = (sectionId: string) => {
+    stopSpeech();
+    if (activeView !== 'overview') {
+      setActiveView('overview');
+      syncUrl('overview', selectedClaimId);
+      setTimeout(() => {
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+      }, 60);
+    } else {
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const handleSelectClaim = (claimId: string) => {
     stopSpeech();
     setSelectedClaimId(claimId);
@@ -172,7 +185,9 @@ export function App() {
 
       <TopNav
         activeView={activeView}
+        selectedClaimId={selectedClaimId}
         onChangeView={handleChangeView}
+        onJumpToSection={handleJumpToSection}
         hyperlegible={hyperlegible}
         onToggleHyperlegible={() => setHyperlegible((v) => !v)}
         isSpeaking={isSpeaking}
@@ -186,6 +201,7 @@ export function App() {
         <LabPage
           selectedClaimId={selectedClaimId}
           onSelectClaim={handleSelectClaim}
+          onBackToOverview={() => handleChangeView('overview')}
           isSpeaking={isSpeaking}
           speechSupported={speechSupported}
           onToggleSpeech={handleToggleSpeech}
@@ -194,7 +210,7 @@ export function App() {
 
       {/* Full Multi-Column Editorial Footer */}
       <footer className="border-t border-zinc-200 bg-zinc-50/70">
-        <div className="mx-auto max-w-6xl px-6 py-16">
+        <div className="mx-auto max-w-7xl px-6 py-16">
           <div className="grid gap-12 md:grid-cols-12">
             {/* Brand & Mission */}
             <div className="md:col-span-5">
@@ -226,16 +242,34 @@ export function App() {
             {/* Explore */}
             <div className="md:col-span-2">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-950">
-                Explore
+                Navigation
               </h3>
               <ul className="mt-4 space-y-2.5 text-sm text-zinc-600">
                 <li>
                   <button
                     type="button"
-                    onClick={() => handleChangeView('overview')}
+                    onClick={() => handleJumpToSection('live-preview')}
                     className="hover:text-zinc-950"
                   >
-                    Overview
+                    Why Claims Shift
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => handleJumpToSection('provenance')}
+                    className="hover:text-zinc-950"
+                  >
+                    How We Label
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => handleJumpToSection('case-studies')}
+                    className="hover:text-zinc-950"
+                  >
+                    6 Case Studies
                   </button>
                 </li>
                 <li>
@@ -247,31 +281,13 @@ export function App() {
                     Stress-Test Lab
                   </button>
                 </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => setHyperlegible((v) => !v)}
-                    className="hover:text-zinc-950"
-                  >
-                    Hyperlegible Mode
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={handleToggleSpeech}
-                    className="hover:text-zinc-950"
-                  >
-                    Neural Audio Summary
-                  </button>
-                </li>
               </ul>
             </div>
 
             {/* Case Studies */}
             <div className="md:col-span-3">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-950">
-                Case Studies
+                Audited Claims
               </h3>
               <ul className="mt-4 space-y-2.5 text-sm text-zinc-600">
                 {CLAIMS_DATA.slice(0, 4).map((claim) => (

@@ -1,6 +1,6 @@
-import { useEffect, useState, type MouseEvent } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
-import { CLAIMS_DATA, type ClaimCaseStudy, type ClaimStatus } from '../data/claims';
+import { useState, type MouseEvent } from 'react';
+import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
+import { CLAIMS_DATA, type ClaimCaseStudy } from '../data/claims';
 import type { ConfidenceLevel } from '../utils/stats';
 import { CitationChecklist } from './CitationChecklist';
 import { ScrubberChart } from './ScrubberChart';
@@ -10,40 +10,10 @@ import { StressTestEngine } from './StressTestEngine';
 interface LabPageProps {
   selectedClaimId: string;
   onSelectClaim: (claimId: string) => void;
+  onBackToOverview?: () => void;
   isSpeaking: boolean;
   speechSupported: boolean;
   onToggleSpeech: () => void;
-}
-
-type StatusFilter = 'all' | ClaimStatus;
-
-const VALID_STATUS_FILTERS: readonly StatusFilter[] = [
-  'all',
-  'verified',
-  'failed-replication',
-  'sources-differ',
-];
-
-function readInitialStatusFilter(): StatusFilter {
-  if (typeof window === 'undefined') return 'all';
-  const param = new URLSearchParams(window.location.search).get('status');
-  return VALID_STATUS_FILTERS.includes(param as StatusFilter)
-    ? (param as StatusFilter)
-    : 'all';
-}
-
-function writeStatusFilterUrl(filter: StatusFilter) {
-  if (typeof window === 'undefined') return;
-  const url = new URL(window.location.href);
-  if (filter === 'all') {
-    url.searchParams.delete('status');
-  } else {
-    url.searchParams.set('status', filter);
-  }
-  const nextUrl = `${url.pathname}${url.search}${url.hash}`;
-  if (nextUrl !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
-    window.history.replaceState(null, '', nextUrl);
-  }
 }
 
 function isPlainLeftClick(event: MouseEvent<HTMLAnchorElement>): boolean {
@@ -89,21 +59,21 @@ function LabWorkspace({
   };
 
   return (
-    <div className="min-w-0 space-y-8 lg:col-span-8 xl:col-span-9">
-      {/* Claim Header */}
-      <section aria-labelledby="claim-headline" className="border-b border-zinc-200 pb-7">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="mt-8 space-y-8">
+      {/* Claim Header Banner */}
+      <section
+        aria-labelledby="claim-headline"
+        className="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2.5">
             <span
               translate="no"
-              className="font-mono-tabular text-xs font-semibold text-zinc-600"
+              className="rounded-md bg-zinc-100 px-2.5 py-1 font-mono-tabular text-xs font-bold text-zinc-800"
             >
               {claim.ticker}
             </span>
-            <span aria-hidden="true" className="text-zinc-300">
-              /
-            </span>
-            <span className="text-xs font-medium text-zinc-600">
+            <span className="text-xs font-medium text-zinc-500">
               {claim.field}
             </span>
             <StatusBadge
@@ -118,84 +88,84 @@ function LabWorkspace({
             onClick={onToggleSpeech}
             disabled={!speechSupported}
             aria-pressed={isSpeaking}
-            aria-label={
-              speechSupported
-                ? isSpeaking
-                  ? `Stop audio summary for ${claim.shortTitle}`
-                  : `Listen to audio summary for ${claim.shortTitle}`
-                : 'Audio summary unavailable in this browser'
-            }
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-[background-color,border-color,color,transform] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 ${
+            className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold transition-colors ${
               isSpeaking
                 ? 'border-emerald-700 bg-emerald-50 text-emerald-900'
-                : 'border-zinc-200 bg-white text-zinc-800 hover:border-zinc-400 hover:text-zinc-950'
+                : 'border-zinc-200 bg-zinc-50 text-zinc-900 hover:border-zinc-400'
             }`}
           >
             {isSpeaking ? (
-              <VolumeX className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <VolumeX className="h-3.5 w-3.5" aria-hidden="true" />
             ) : (
-              <Volume2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <Volume2 className="h-3.5 w-3.5" aria-hidden="true" />
             )}
-            {isSpeaking ? 'Stop Audio' : 'Audio Summary'}
+            {isSpeaking ? 'Stop Neural Audio' : 'Listen to Neural Audio Brief'}
           </button>
         </div>
 
         <h1
           id="claim-headline"
-          className="mt-5 text-balance text-2xl font-bold tracking-[-0.03em] text-zinc-950 sm:text-3xl sm:leading-[1.2]"
+          className="mt-4 text-balance text-2xl font-bold tracking-[-0.03em] text-zinc-950 sm:text-4xl"
         >
           &ldquo;{claim.headline}&rdquo;
         </h1>
 
-        <p className="mt-4 max-w-[68ch] text-pretty text-base leading-relaxed text-zinc-600">
+        <p className="mt-3 max-w-4xl text-base leading-relaxed text-zinc-600">
           {claim.summary}
         </p>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-xl border border-zinc-200/80 bg-zinc-50/80 p-4">
-            <div className="text-xs font-semibold text-zinc-500">
-              Original Claim
+        <div className="mt-6 grid gap-4 border-t border-zinc-100 pt-5 sm:grid-cols-2">
+          <div className="rounded-xl bg-zinc-50/90 p-4">
+            <div className="font-mono-tabular text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+              Original Claim Citation
             </div>
-            <div className="mt-1 text-sm leading-relaxed text-zinc-900">
+            <div className="mt-1 text-sm font-medium text-zinc-900">
               {claim.originalCitation}
             </div>
           </div>
-          <div className="rounded-xl border border-zinc-200/80 bg-zinc-50/80 p-4">
-            <div className="text-xs font-semibold text-zinc-500">
-              Latest Consensus
+          <div className="rounded-xl bg-zinc-50/90 p-4">
+            <div className="font-mono-tabular text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+              Latest Replication Consensus
             </div>
-            <div className="mt-1 text-sm leading-relaxed text-zinc-900">
+            <div className="mt-1 text-sm font-medium text-zinc-900">
               {claim.latestCitation}
             </div>
           </div>
         </div>
       </section>
 
-      <ScrubberChart
-        milestones={claim.milestones}
-        status={claim.status}
-        activeIndex={Math.min(milestoneIndex, claim.milestones.length - 1)}
-        onSelectIndex={setMilestoneIndex}
-      />
+      {/* Side-by-Side Workbench: Scrubber Chart (7 cols) + Live Stress-Test Engine (5 cols) */}
+      <div className="grid items-start gap-8 lg:grid-cols-12">
+        <div className="space-y-8 lg:col-span-7">
+          <ScrubberChart
+            milestones={claim.milestones}
+            status={claim.status}
+            activeIndex={Math.min(milestoneIndex, claim.milestones.length - 1)}
+            onSelectIndex={setMilestoneIndex}
+          />
 
-      <StressTestEngine
-        baselineEffect={claim.stressDefaults.baselineEffect}
-        sampleSize={sampleSize}
-        biasTrimPercent={biasTrimPercent}
-        confidenceLevel={confidenceLevel}
-        onChangeSampleSize={setSampleSize}
-        onChangeBiasTrim={setBiasTrimPercent}
-        onChangeConfidence={setConfidenceLevel}
-        onReset={handleResetStressTest}
-      />
+          <CitationChecklist
+            key={claim.id}
+            claimId={claim.id}
+            items={claim.checklist}
+            checkedIds={checkedItems}
+            onToggleItem={onToggleChecklistItem}
+          />
+        </div>
 
-      <CitationChecklist
-        key={claim.id}
-        claimId={claim.id}
-        items={claim.checklist}
-        checkedIds={checkedItems}
-        onToggleItem={onToggleChecklistItem}
-      />
+        <div className="lg:sticky lg:top-24 lg:col-span-5">
+          <StressTestEngine
+            baselineEffect={claim.stressDefaults.baselineEffect}
+            sampleSize={sampleSize}
+            biasTrimPercent={biasTrimPercent}
+            confidenceLevel={confidenceLevel}
+            onChangeSampleSize={setSampleSize}
+            onChangeBiasTrim={setBiasTrimPercent}
+            onChangeConfidence={setConfidenceLevel}
+            onReset={handleResetStressTest}
+          />
+        </div>
+      </div>
     </div>
   );
 }
@@ -203,28 +173,15 @@ function LabWorkspace({
 export function LabPage({
   selectedClaimId,
   onSelectClaim,
+  onBackToOverview,
   isSpeaking,
   speechSupported,
   onToggleSpeech,
 }: LabPageProps) {
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>(
-    readInitialStatusFilter
-  );
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
-
-  useEffect(() => {
-    const syncFilter = () => setStatusFilter(readInitialStatusFilter());
-    window.addEventListener('popstate', syncFilter);
-    return () => window.removeEventListener('popstate', syncFilter);
-  }, []);
 
   const selectedClaim: ClaimCaseStudy =
     CLAIMS_DATA.find((c) => c.id === selectedClaimId) ?? CLAIMS_DATA[0];
-
-  const handleChangeFilter = (nextFilter: StatusFilter) => {
-    setStatusFilter(nextFilter);
-    writeStatusFilterUrl(nextFilter);
-  };
 
   const handleToggleChecklistItem = (itemId: string) => {
     setCheckedItems((prev) => ({
@@ -233,138 +190,109 @@ export function LabPage({
     }));
   };
 
-  const filteredClaims =
-    statusFilter === 'all'
-      ? CLAIMS_DATA
-      : CLAIMS_DATA.filter((c) => c.status === statusFilter);
-
-  const filterSuffix =
-    statusFilter === 'all' ? '' : `&status=${encodeURIComponent(statusFilter)}`;
-
   return (
     <main
       id="main-content"
       tabIndex={-1}
-      className="mx-auto max-w-6xl px-6 pb-28 pt-10 focus:outline-none sm:pt-12"
+      className="mx-auto max-w-7xl px-6 pb-28 pt-8 focus:outline-none"
     >
-      <div className="grid gap-10 lg:grid-cols-12">
-        {/* Left Sidebar */}
-        <aside aria-label="Case study selector" className="lg:col-span-4 xl:col-span-3">
-          <div className="lg:sticky lg:top-24">
-            <div className="flex items-baseline justify-between gap-2">
-              <h2 className="text-sm font-semibold text-zinc-950">
-                Case Studies
-              </h2>
-              <span className="font-mono-tabular text-xs font-medium text-zinc-500">
-                {filteredClaims.length} of {CLAIMS_DATA.length}
-              </span>
-            </div>
+      {/* Top Sub-Navbar: Breadcrumb + Horizontal Case Study Switcher */}
+      <div className="flex flex-col gap-4 border-b border-zinc-200 pb-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs font-medium text-zinc-500">
+            {onBackToOverview && (
+              <button
+                type="button"
+                onClick={onBackToOverview}
+                className="inline-flex items-center gap-1 font-semibold text-zinc-700 hover:text-zinc-950"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Landing
+              </button>
+            )}
+            <span>/</span>
+            <span>Stress-Test Lab</span>
+            <span>/</span>
+            <span className="font-mono-tabular font-semibold text-zinc-950">
+              {selectedClaim.ticker}
+            </span>
+          </div>
 
-            {/* Filter Pills */}
-            <div
-              role="group"
-              aria-label="Filter case studies by verification status"
-              className="mt-3.5 flex flex-wrap gap-2"
-            >
-              {(
-                [
-                  { id: 'all', label: 'All' },
-                  { id: 'verified', label: 'Verified' },
-                  { id: 'failed-replication', label: 'Failed' },
-                  { id: 'sources-differ', label: 'Differ' },
-                ] as const
-              ).map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => handleChangeFilter(f.id)}
-                  aria-pressed={statusFilter === f.id}
-                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-[background-color,border-color,color,transform] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 ${
-                    statusFilter === f.id
-                      ? 'border-zinc-950 bg-zinc-950 text-white'
-                      : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 hover:text-zinc-950'
+          <span className="font-mono-tabular text-xs text-zinc-500">
+            Select any case study below to switch workbench
+          </span>
+        </div>
+
+        {/* Clean Horizontal Case Study Tabs */}
+        <nav
+          aria-label="Case study workbench tabs"
+          className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6"
+        >
+          {CLAIMS_DATA.map((claim) => {
+            const isSelected = claim.id === selectedClaim.id;
+            const latest = claim.milestones[claim.milestones.length - 1];
+
+            return (
+              <a
+                key={claim.id}
+                href={`?view=lab&claim=${encodeURIComponent(claim.id)}`}
+                onClick={(event) => {
+                  if (!isPlainLeftClick(event)) return;
+                  event.preventDefault();
+                  onSelectClaim(claim.id);
+                }}
+                aria-current={isSelected ? 'page' : undefined}
+                className={`flex flex-col justify-between rounded-xl border p-3 text-left transition-all ${
+                  isSelected
+                    ? 'border-zinc-950 bg-zinc-950 text-white shadow-xs'
+                    : 'border-zinc-200 bg-white text-zinc-900 hover:border-zinc-400 hover:bg-zinc-50'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-1.5">
+                  <span
+                    translate="no"
+                    className={`font-mono-tabular text-[11px] font-bold ${
+                      isSelected ? 'text-zinc-300' : 'text-zinc-500'
+                    }`}
+                  >
+                    {claim.ticker}
+                  </span>
+                  <span
+                    className={`h-2 w-2 rounded-full ${
+                      claim.status === 'verified'
+                        ? 'bg-emerald-500'
+                        : claim.status === 'failed-replication'
+                        ? 'bg-rose-500'
+                        : 'bg-amber-500'
+                    }`}
+                  />
+                </div>
+                <div className="mt-1.5 line-clamp-1 text-xs font-bold">
+                  {claim.shortTitle}
+                </div>
+                <div
+                  className={`mt-1 font-mono-tabular text-[11px] ${
+                    isSelected ? 'text-zinc-300' : 'text-zinc-500'
                   }`}
                 >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Clean Claim List */}
-            {filteredClaims.length === 0 ? (
-              <div className="mt-5 rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-xs text-zinc-600">
-                <p>No case studies match this filter.</p>
-                <button
-                  type="button"
-                  onClick={() => handleChangeFilter('all')}
-                  className="mt-2 font-semibold text-zinc-950 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
-                >
-                  Show all case studies
-                </button>
-              </div>
-            ) : (
-              <ul className="mt-5 divide-y divide-zinc-200 border-b border-t border-zinc-200">
-                {filteredClaims.map((claim) => {
-                  const isSelected = claim.id === selectedClaim.id;
-                  const latest = claim.milestones[claim.milestones.length - 1];
-
-                  return (
-                    <li key={claim.id}>
-                      <a
-                        href={`?view=lab&claim=${encodeURIComponent(claim.id)}${filterSuffix}`}
-                        onClick={(event) => {
-                          if (!isPlainLeftClick(event)) return;
-                          event.preventDefault();
-                          onSelectClaim(claim.id);
-                        }}
-                        aria-current={isSelected ? 'page' : undefined}
-                        className={`block w-full px-3.5 py-4 text-left transition-[background-color,box-shadow] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-zinc-950 ${
-                          isSelected
-                            ? 'bg-zinc-100/90 shadow-[inset_2px_0_0_#09090B]'
-                            : 'bg-white hover:bg-zinc-50/90'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <span
-                            translate="no"
-                            className="font-mono-tabular text-xs font-semibold text-zinc-500"
-                          >
-                            {claim.ticker}
-                          </span>
-                          <StatusBadge
-                            status={claim.status}
-                            label={claim.statusLabel}
-                          />
-                        </div>
-                        <div className="mt-2 text-sm font-semibold leading-snug text-zinc-950">
-                          {claim.shortTitle}
-                        </div>
-                        <div className="mt-1.5 flex items-center justify-between gap-3 font-mono-tabular text-xs text-zinc-600">
-                          <span className="truncate">{claim.field}</span>
-                          <span className="shrink-0 text-zinc-700">
-                            {latest.effectDisplay}
-                          </span>
-                        </div>
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
-        </aside>
-
-        {/* Main Workspace */}
-        <LabWorkspace
-          key={selectedClaim.id}
-          claim={selectedClaim}
-          isSpeaking={isSpeaking}
-          speechSupported={speechSupported}
-          onToggleSpeech={onToggleSpeech}
-          checkedItems={checkedItems}
-          onToggleChecklistItem={handleToggleChecklistItem}
-        />
+                  {latest.effectDisplay}
+                </div>
+              </a>
+            );
+          })}
+        </nav>
       </div>
+
+      {/* Main Workbench */}
+      <LabWorkspace
+        key={selectedClaim.id}
+        claim={selectedClaim}
+        isSpeaking={isSpeaking}
+        speechSupported={speechSupported}
+        onToggleSpeech={onToggleSpeech}
+        checkedItems={checkedItems}
+        onToggleChecklistItem={handleToggleChecklistItem}
+      />
     </main>
   );
 }
