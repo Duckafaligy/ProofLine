@@ -1,4 +1,4 @@
-import { Eye, Volume2, VolumeX, Activity, Compass } from 'lucide-react';
+import { Eye, Volume2, VolumeX } from 'lucide-react';
 
 export type AppView = 'overview' | 'lab';
 
@@ -22,88 +22,67 @@ export function TopNav({
   onToggleSpeech,
 }: TopNavProps) {
   return (
-    <header className="sticky top-0 z-40 border-b border-white/[0.08] bg-[#0B0C0E]/85 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
+    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/95 backdrop-blur-sm">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
         {/* Brand */}
         <button
           type="button"
           onClick={() => onChangeView('overview')}
-          className="group flex items-center gap-2.5 text-left focus:outline-none"
+          className="flex items-center gap-2.5 text-left focus:outline-none"
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.1] bg-[#13151A] shadow-sm transition-colors group-hover:border-[#2563EB]/60">
-            <svg
-              viewBox="0 0 24 24"
-              className="h-5 w-5"
-              fill="none"
-              aria-hidden="true"
-            >
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950 text-white">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
               <path
-                d="M3 14.5L7.5 8.5L12 13L16.5 6L21 12"
-                stroke="#2563EB"
-                strokeWidth="2.2"
+                d="M3 15L8 9L12.5 13.5L17.5 6.5L21 11"
+                stroke="currentColor"
+                strokeWidth="2.4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              <circle cx="16.5" cy="6" r="2" fill="#10B981" />
             </svg>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-base font-bold tracking-tight text-[#F8FAFC]">
-                ProofLine
-              </span>
-              <span className="rounded border border-white/[0.1] bg-[#1C1F26] px-1.5 py-0.5 font-mono-tabular text-[10px] font-semibold uppercase tracking-wider text-[#94A3B8]">
-                STEM 2026
-              </span>
-            </div>
-            <p className="hidden text-[11px] text-[#94A3B8] sm:block">
-              Scientific Claim Replication &amp; Stress-Test Lab
-            </p>
-          </div>
+          <span className="text-base font-bold tracking-[-0.03em] text-zinc-950">
+            ProofLine
+          </span>
         </button>
 
-        {/* Center View Switcher */}
-        <nav
-          aria-label="Primary View"
-          className="flex items-center rounded-lg border border-white/[0.08] bg-[#13151A] p-1"
-        >
+        {/* Center Nav */}
+        <nav aria-label="Primary View" className="flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-100/80 p-1">
           <button
             type="button"
             onClick={() => onChangeView('overview')}
-            className={`inline-flex items-center gap-1.5 rounded-md px-3.5 py-1.5 text-xs font-semibold transition-all ${
+            className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
               activeView === 'overview'
-                ? 'bg-[#2563EB] text-white shadow-sm'
-                : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                ? 'bg-white text-zinc-950 shadow-xs'
+                : 'text-zinc-600 hover:text-zinc-950'
             }`}
           >
-            <Compass className="h-3.5 w-3.5" />
             Overview
           </button>
           <button
             type="button"
             onClick={() => onChangeView('lab')}
-            className={`inline-flex items-center gap-1.5 rounded-md px-3.5 py-1.5 text-xs font-semibold transition-all ${
+            className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
               activeView === 'lab'
-                ? 'bg-[#2563EB] text-white shadow-sm'
-                : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                ? 'bg-white text-zinc-950 shadow-xs'
+                : 'text-zinc-600 hover:text-zinc-950'
             }`}
           >
-            <Activity className="h-3.5 w-3.5" />
-            Lab
+            Stress-Test Lab
           </button>
         </nav>
 
-        {/* Right Accessibility & Audio Controls */}
+        {/* Accessibility & Audio */}
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onToggleHyperlegible}
             aria-pressed={hyperlegible}
-            title="Toggle Atkinson Hyperlegible High-Contrast Accessibility Mode"
-            className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
+            title="Toggle Atkinson Hyperlegible High-Contrast Mode"
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
               hyperlegible
-                ? 'border-[#2563EB] bg-[#2563EB]/15 text-[#F8FAFC]'
-                : 'border-white/[0.08] bg-[#13151A] text-[#94A3B8] hover:border-white/20 hover:text-[#F8FAFC]'
+                ? 'border-zinc-950 bg-zinc-950 text-white'
+                : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 hover:text-zinc-950'
             }`}
           >
             <Eye className="h-3.5 w-3.5" />
@@ -119,20 +98,16 @@ export function TopNav({
             aria-pressed={isSpeaking}
             title={
               speechSupported
-                ? 'Read aloud an accessible audio summary using Web Speech API'
+                ? 'Read aloud an accessible audio summary'
                 : 'Web Speech API not supported in this browser'
             }
-            className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
               isSpeaking
-                ? 'border-[#10B981] bg-[#10B981]/15 text-[#10B981]'
-                : 'border-white/[0.08] bg-[#13151A] text-[#94A3B8] hover:border-white/20 hover:text-[#F8FAFC]'
+                ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
+                : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 hover:text-zinc-950'
             }`}
           >
-            {isSpeaking ? (
-              <VolumeX className="h-3.5 w-3.5" />
-            ) : (
-              <Volume2 className="h-3.5 w-3.5" />
-            )}
+            {isSpeaking ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
             <span className="hidden sm:inline">
               {isSpeaking ? 'Stop Audio' : 'Audio Summary'}
             </span>

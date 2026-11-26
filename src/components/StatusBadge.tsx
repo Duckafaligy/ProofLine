@@ -12,24 +12,21 @@ const STATUS_CONFIG: Record<
 > = {
   verified: {
     defaultLabel: 'Verified',
-    dotClass: 'bg-[#10B981]',
-    badgeClass:
-      'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/25',
-    hex: '#10B981',
+    dotClass: 'bg-emerald-600',
+    badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+    hex: '#16A34A',
   },
   'failed-replication': {
     defaultLabel: 'Failed Replication',
-    dotClass: 'bg-[#F43F5E]',
-    badgeClass:
-      'bg-[#F43F5E]/10 text-[#F43F5E] border-[#F43F5E]/25',
-    hex: '#F43F5E',
+    dotClass: 'bg-rose-600',
+    badgeClass: 'bg-rose-50 text-rose-800 border-rose-200',
+    hex: '#DC2626',
   },
   'sources-differ': {
     defaultLabel: 'Sources Differ',
-    dotClass: 'bg-[#F59E0B]',
-    badgeClass:
-      'bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/25',
-    hex: '#F59E0B',
+    dotClass: 'bg-amber-600',
+    badgeClass: 'bg-amber-50 text-amber-800 border-amber-200',
+    hex: '#D97706',
   },
 };
 

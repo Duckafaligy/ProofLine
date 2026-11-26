@@ -29,10 +29,7 @@ export function ScrubberChart({
   const safeIndex = Math.max(0, Math.min(milestones.length - 1, activeIndex));
   const active = milestones[safeIndex];
 
-  const maxEffect = Math.max(
-    1.0,
-    ...milestones.map((m) => m.effectSize * 1.18)
-  );
+  const maxEffect = Math.max(1.0, ...milestones.map((m) => m.effectSize * 1.18));
   const minEffect = 0;
 
   const plotW = SVG_WIDTH - PAD_LEFT - PAD_RIGHT;
@@ -81,59 +78,51 @@ export function ScrubberChart({
   const yTicks = [0, maxEffect * 0.5, maxEffect];
 
   return (
-    <div className="hairline-card rounded-xl border border-white/[0.08] bg-[#13151A] p-4 sm:p-5">
-      {/* Scrubber HUD Header */}
-      <div className="mb-4 flex flex-col justify-between gap-3 border-b border-white/[0.06] pb-4 sm:flex-row sm:items-end">
+    <div className="hairline-card rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
+      {/* Header */}
+      <div className="mb-6 flex flex-col justify-between gap-4 border-b border-zinc-100 pb-5 sm:flex-row sm:items-end">
         <div>
-          <div className="flex items-center gap-2 text-xs font-medium text-[#94A3B8]">
-            <span className="uppercase tracking-wider">Effect Size Trajectory</span>
-            <span className="text-white/20">•</span>
-            <span>Hover or drag chart to scrub milestones</span>
+          <div className="text-xs font-medium text-zinc-500">
+            Effect Size Trajectory · Hover or drag to scrub
           </div>
           <div className="mt-1.5 flex flex-wrap items-baseline gap-3">
             <span
-              className="font-mono-tabular text-2xl font-bold tracking-tight sm:text-3xl"
+              className="font-mono-tabular text-3xl font-bold tracking-tight sm:text-4xl"
               style={{ color: accentHex }}
             >
               {active.effectDisplay}
             </span>
-            <span className="font-mono-tabular text-xs text-[#94A3B8]">
+            <span className="font-mono-tabular text-sm text-zinc-500">
               {active.year} · {active.label}
             </span>
           </div>
         </div>
 
         {/* Exact Milestone Telemetry */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          <div className="rounded-lg border border-white/[0.06] bg-[#1C1F26] px-3 py-1.5">
-            <div className="text-[10px] uppercase tracking-wider text-[#94A3B8]">
-              Sample (N)
-            </div>
-            <div className="font-mono-tabular text-sm font-semibold text-[#F8FAFC]">
+        <div className="flex gap-6 font-mono-tabular">
+          <div>
+            <div className="text-[11px] text-zinc-400">Sample (N)</div>
+            <div className="text-sm font-semibold text-zinc-950">
               {active.sampleSize.toLocaleString()}
             </div>
           </div>
-          <div className="rounded-lg border border-white/[0.06] bg-[#1C1F26] px-3 py-1.5">
-            <div className="text-[10px] uppercase tracking-wider text-[#94A3B8]">
-              Significance
-            </div>
-            <div className="font-mono-tabular text-sm font-semibold text-[#F8FAFC]">
+          <div>
+            <div className="text-[11px] text-zinc-400">Significance</div>
+            <div className="text-sm font-semibold text-zinc-950">
               {active.pValueLabel}
             </div>
           </div>
-          <div className="rounded-lg border border-white/[0.06] bg-[#1C1F26] px-3 py-1.5">
-            <div className="text-[10px] uppercase tracking-wider text-[#94A3B8]">
-              Std. Effect
-            </div>
-            <div className="font-mono-tabular text-sm font-semibold text-[#F8FAFC]">
+          <div>
+            <div className="text-[11px] text-zinc-400">Std. Effect</div>
+            <div className="text-sm font-semibold text-zinc-950">
               {active.effectSize.toFixed(2)}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Interactive Robinhood-Style SVG */}
-      <div className="relative select-none">
+      {/* SVG Scrubber */}
+      <div className="relative select-none rounded-xl bg-zinc-50/70 p-3">
         <svg
           ref={svgRef}
           viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
@@ -154,19 +143,12 @@ export function ScrubberChart({
           onPointerLeave={() => setIsDragging(false)}
         >
           <defs>
-            <linearGradient
-              id={`proofline-grad-${status}`}
-              x1="0"
-              y1="0"
-              x2="0"
-              y2="1"
-            >
-              <stop offset="0%" stopColor={accentHex} stopOpacity="0.28" />
+            <linearGradient id={`proofline-grad-${status}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={accentHex} stopOpacity="0.14" />
               <stop offset="100%" stopColor={accentHex} stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
-          {/* Horizontal Gridlines */}
           {yTicks.map((val, idx) => {
             const ratio = (val - minEffect) / (maxEffect - minEffect || 1);
             const y = PAD_TOP + plotH - ratio * plotH;
@@ -178,11 +160,7 @@ export function ScrubberChart({
                   y1={y}
                   x2={SVG_WIDTH - PAD_RIGHT}
                   y2={y}
-                  stroke={
-                    isZero
-                      ? 'rgba(255,255,255,0.22)'
-                      : 'rgba(255,255,255,0.06)'
-                  }
+                  stroke={isZero ? '#D4D4D8' : '#E4E4E7'}
                   strokeDasharray={isZero ? '4 4' : undefined}
                   strokeWidth={1}
                 />
@@ -190,7 +168,7 @@ export function ScrubberChart({
                   x={PAD_LEFT - 8}
                   y={y + 4}
                   textAnchor="end"
-                  className="fill-[#94A3B8] font-mono-tabular text-[10px]"
+                  className="fill-zinc-400 font-mono-tabular text-[10px]"
                 >
                   {val.toFixed(1)}
                 </text>
@@ -198,65 +176,52 @@ export function ScrubberChart({
             );
           })}
 
-          {/* Null Effect Label */}
           <text
             x={SVG_WIDTH - PAD_RIGHT}
             y={baselineY - 6}
             textAnchor="end"
-            className="fill-[#94A3B8] font-mono-tabular text-[10px]"
+            className="fill-zinc-400 font-mono-tabular text-[10px]"
           >
             Null Threshold (d = 0.00)
           </text>
 
-          {/* Area Fill */}
-          {areaPath && (
-            <path d={areaPath} fill={`url(#proofline-grad-${status})`} />
-          )}
+          {areaPath && <path d={areaPath} fill={`url(#proofline-grad-${status})`} />}
 
-          {/* Main Trajectory Line */}
           {linePath && (
             <path
               d={linePath}
               fill="none"
               stroke={accentHex}
-              strokeWidth={2.75}
+              strokeWidth={2.5}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
           )}
 
-          {/* Vertical Scrubber Crosshair */}
           {activePoint && (
             <line
               x1={activePoint.x}
               y1={PAD_TOP}
               x2={activePoint.x}
               y2={baselineY}
-              stroke="rgba(248, 250, 252, 0.35)"
+              stroke="#71717A"
               strokeWidth={1}
               strokeDasharray="3 3"
             />
           )}
 
-          {/* Milestone Nodes & X-Axis Year Labels */}
           {points.map((pt) => {
             const isActive = pt.index === safeIndex;
             return (
               <g key={pt.milestone.year}>
                 {isActive && (
-                  <circle
-                    cx={pt.x}
-                    cy={pt.y}
-                    r={11}
-                    fill={accentHex}
-                    fillOpacity={0.2}
-                  />
+                  <circle cx={pt.x} cy={pt.y} r={10} fill={accentHex} fillOpacity={0.16} />
                 )}
                 <circle
                   cx={pt.x}
                   cy={pt.y}
-                  r={isActive ? 5.5 : 3.5}
-                  fill={isActive ? '#F8FAFC' : '#13151A'}
+                  r={isActive ? 5 : 3.5}
+                  fill={isActive ? '#FFFFFF' : '#FAFAFA'}
                   stroke={accentHex}
                   strokeWidth={isActive ? 3 : 2}
                 />
@@ -265,9 +230,7 @@ export function ScrubberChart({
                   y={SVG_HEIGHT - 8}
                   textAnchor="middle"
                   className={`font-mono-tabular text-[11px] ${
-                    isActive
-                      ? 'fill-[#F8FAFC] font-semibold'
-                      : 'fill-[#94A3B8]'
+                    isActive ? 'fill-zinc-950 font-semibold' : 'fill-zinc-400'
                   }`}
                 >
                   {pt.milestone.year}
@@ -278,23 +241,23 @@ export function ScrubberChart({
         </svg>
       </div>
 
-      {/* "Why the line moved" Annotation Card */}
-      <div className="mt-3 rounded-lg border border-white/[0.08] bg-[#1C1F26] p-3.5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">
+      {/* Why the line moved */}
+      <div className="mt-5 rounded-xl bg-zinc-50 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500">
+          <span className="font-semibold text-zinc-900">
             Why the line moved · {active.study} ({active.year})
           </span>
-          <span className="font-mono-tabular text-xs text-[#94A3B8]">
+          <span className="font-mono-tabular">
             Milestone {safeIndex + 1} of {milestones.length}
           </span>
         </div>
-        <p className="mt-1.5 text-sm leading-relaxed text-[#F8FAFC]">
+        <p className="mt-1.5 text-sm leading-relaxed text-zinc-700">
           {active.whyMoved}
         </p>
       </div>
 
-      {/* Keyboard / Clickable Milestone Pills */}
-      <div className="mt-3 flex flex-wrap gap-2">
+      {/* Milestone Pills */}
+      <div className="mt-4 flex flex-wrap gap-2">
         {milestones.map((m, i) => {
           const isActive = i === safeIndex;
           return (
@@ -303,10 +266,10 @@ export function ScrubberChart({
               type="button"
               onClick={() => onSelectIndex(i)}
               aria-pressed={isActive}
-              className={`rounded-lg border px-3 py-1.5 text-left text-xs transition-colors ${
+              className={`rounded-full border px-3.5 py-1.5 text-xs transition-colors ${
                 isActive
-                  ? 'border-[#2563EB] bg-[#2563EB]/15 text-[#F8FAFC]'
-                  : 'border-white/[0.08] bg-[#0B0C0E] text-[#94A3B8] hover:border-white/20 hover:text-[#F8FAFC]'
+                  ? 'border-zinc-950 bg-zinc-950 text-white'
+                  : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-400 hover:text-zinc-950'
               }`}
             >
               <span className="font-mono-tabular font-semibold">{m.year}</span>{' '}

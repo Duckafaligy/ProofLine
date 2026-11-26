@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BookOpen, Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
 import { CLAIMS_DATA, type ClaimCaseStudy, type ClaimStatus } from '../data/claims';
 import type { ConfidenceLevel } from '../utils/stats';
 import { CitationChecklist } from './CitationChecklist';
@@ -30,7 +30,6 @@ export function LabPage({
   const selectedClaim: ClaimCaseStudy =
     CLAIMS_DATA.find((c) => c.id === selectedClaimId) ?? CLAIMS_DATA[0];
 
-  // Stress-test state keyed by claim ID or reset on claim switch
   const [sampleSize, setSampleSize] = useState<number>(
     selectedClaim.stressDefaults.sampleSize
   );
@@ -67,19 +66,17 @@ export function LabPage({
       : CLAIMS_DATA.filter((c) => c.status === statusFilter);
 
   return (
-    <main className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6">
-      <div className="grid gap-6 lg:grid-cols-12">
-        {/* Left Sidebar: Case Study Selector */}
+    <main className="mx-auto max-w-6xl px-6 pb-24 pt-10">
+      <div className="grid gap-10 lg:grid-cols-12">
+        {/* Left Sidebar */}
         <aside className="lg:col-span-4 xl:col-span-3">
-          <div className="hairline-card sticky top-20 rounded-xl border border-white/[0.08] bg-[#13151A] p-3.5">
-            <div className="flex items-center justify-between pb-2.5">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">
-                Case Studies ({filteredClaims.length})
-              </h2>
-            </div>
+          <div className="sticky top-24">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              Case Studies ({filteredClaims.length})
+            </h2>
 
             {/* Filter Pills */}
-            <div className="mb-3 flex flex-wrap gap-1.5">
+            <div className="mt-3 flex flex-wrap gap-1.5">
               {(
                 [
                   { id: 'all', label: 'All' },
@@ -92,10 +89,10 @@ export function LabPage({
                   key={f.id}
                   type="button"
                   onClick={() => setStatusFilter(f.id)}
-                  className={`rounded-md border px-2 py-1 text-[11px] font-medium transition-colors ${
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                     statusFilter === f.id
-                      ? 'border-[#2563EB] bg-[#2563EB]/20 text-[#F8FAFC]'
-                      : 'border-white/[0.08] bg-[#1C1F26] text-[#94A3B8] hover:text-[#F8FAFC]'
+                      ? 'border-zinc-950 bg-zinc-950 text-white'
+                      : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-400 hover:text-zinc-950'
                   }`}
                 >
                   {f.label}
@@ -103,8 +100,8 @@ export function LabPage({
               ))}
             </div>
 
-            {/* Claim List */}
-            <div className="space-y-2">
+            {/* Clean Claim List */}
+            <div className="mt-4 divide-y divide-zinc-200 border-t border-zinc-200">
               {filteredClaims.map((claim) => {
                 const isSelected = claim.id === selectedClaim.id;
                 const latest = claim.milestones[claim.milestones.length - 1];
@@ -114,25 +111,22 @@ export function LabPage({
                     key={claim.id}
                     type="button"
                     onClick={() => handleSelectClaim(claim)}
-                    className={`w-full rounded-lg border p-3 text-left transition-all ${
+                    className={`w-full px-3 py-3.5 text-left transition-colors ${
                       isSelected
-                        ? 'border-[#2563EB] bg-[#2563EB]/10'
-                        : 'border-white/[0.06] bg-[#1C1F26]/60 hover:border-white/20 hover:bg-[#1C1F26]'
+                        ? 'bg-zinc-100/90'
+                        : 'bg-white hover:bg-zinc-50'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-mono-tabular text-[10px] font-semibold tracking-wider text-[#94A3B8]">
+                      <span className="font-mono-tabular text-[11px] font-semibold text-zinc-400">
                         {claim.ticker}
                       </span>
-                      <StatusBadge
-                        status={claim.status}
-                        label={claim.statusLabel}
-                      />
+                      <StatusBadge status={claim.status} label={claim.statusLabel} />
                     </div>
-                    <div className="mt-1.5 text-sm font-semibold text-[#F8FAFC]">
+                    <div className="mt-1.5 text-sm font-semibold text-zinc-950">
                       {claim.shortTitle}
                     </div>
-                    <div className="mt-1 flex items-center justify-between font-mono-tabular text-[11px] text-[#94A3B8]">
+                    <div className="mt-1 flex items-center justify-between font-mono-tabular text-xs text-zinc-500">
                       <span>{claim.field}</span>
                       <span>{latest.effectDisplay}</span>
                     </div>
@@ -143,16 +137,17 @@ export function LabPage({
           </div>
         </aside>
 
-        {/* Main Lab Workspace */}
-        <div className="space-y-5 lg:col-span-8 xl:col-span-9">
-          {/* Claim Header Card */}
-          <section className="hairline-card rounded-xl border border-white/[0.08] bg-[#13151A] p-5">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded border border-white/[0.1] bg-[#1C1F26] px-2 py-0.5 font-mono-tabular text-xs font-semibold text-[#94A3B8]">
+        {/* Main Workspace */}
+        <div className="space-y-8 lg:col-span-8 xl:col-span-9">
+          {/* Claim Header */}
+          <section className="border-b border-zinc-200 pb-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="font-mono-tabular text-xs font-semibold text-zinc-500">
                   {selectedClaim.ticker}
                 </span>
-                <span className="text-xs font-medium text-[#94A3B8]">
+                <span className="text-zinc-300">/</span>
+                <span className="text-xs font-medium text-zinc-500">
                   {selectedClaim.field}
                 </span>
                 <StatusBadge
@@ -166,67 +161,44 @@ export function LabPage({
                 type="button"
                 onClick={onToggleSpeech}
                 disabled={!speechSupported}
-                className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
                   isSpeaking
-                    ? 'border-[#10B981] bg-[#10B981]/15 text-[#10B981]'
-                    : 'border-white/[0.1] bg-[#1C1F26] text-[#F8FAFC] hover:border-[#2563EB]'
+                    ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
+                    : 'border-zinc-200 bg-white text-zinc-800 hover:border-zinc-400'
                 }`}
               >
-                {isSpeaking ? (
-                  <VolumeX className="h-3.5 w-3.5" />
-                ) : (
-                  <Volume2 className="h-3.5 w-3.5 text-[#2563EB]" />
-                )}
-                {isSpeaking ? 'Stop Audio Readout' : 'Audio Summary'}
+                {isSpeaking ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+                {isSpeaking ? 'Stop Audio' : 'Audio Summary'}
               </button>
             </div>
 
-            <h1 className="mt-3 text-xl font-bold tracking-tight text-[#F8FAFC] sm:text-2xl">
+            <h1 className="mt-4 text-2xl font-bold tracking-[-0.03em] text-zinc-950 sm:text-3xl">
               &ldquo;{selectedClaim.headline}&rdquo;
             </h1>
 
-            <p className="mt-2 text-sm leading-relaxed text-[#94A3B8]">
+            <p className="mt-3 text-base leading-relaxed text-zinc-600">
               {selectedClaim.summary}
             </p>
 
-            <div className="mt-4 grid gap-2.5 border-t border-white/[0.06] pt-3.5 text-xs sm:grid-cols-2">
-              <div className="flex items-start gap-2">
-                <BookOpen className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#94A3B8]" />
-                <div>
-                  <span className="font-semibold text-[#94A3B8]">
-                    Original Claim:{' '}
-                  </span>
-                  <span className="text-[#F8FAFC]">
-                    {selectedClaim.originalCitation}
-                  </span>
-                </div>
+            <div className="mt-5 grid gap-4 text-xs sm:grid-cols-2">
+              <div className="rounded-lg bg-zinc-50 p-3.5">
+                <span className="font-semibold text-zinc-500">Original Claim: </span>
+                <span className="text-zinc-900">{selectedClaim.originalCitation}</span>
               </div>
-              <div className="flex items-start gap-2">
-                <BookOpen className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#10B981]" />
-                <div>
-                  <span className="font-semibold text-[#94A3B8]">
-                    Latest Consensus:{' '}
-                  </span>
-                  <span className="text-[#F8FAFC]">
-                    {selectedClaim.latestCitation}
-                  </span>
-                </div>
+              <div className="rounded-lg bg-zinc-50 p-3.5">
+                <span className="font-semibold text-zinc-500">Latest Consensus: </span>
+                <span className="text-zinc-900">{selectedClaim.latestCitation}</span>
               </div>
             </div>
           </section>
 
-          {/* Interactive Robinhood-Style SVG Scrubber Chart */}
           <ScrubberChart
             milestones={selectedClaim.milestones}
             status={selectedClaim.status}
-            activeIndex={Math.min(
-              milestoneIndex,
-              selectedClaim.milestones.length - 1
-            )}
+            activeIndex={Math.min(milestoneIndex, selectedClaim.milestones.length - 1)}
             onSelectIndex={setMilestoneIndex}
           />
 
-          {/* Live Statistical Stress-Test Engine */}
           <StressTestEngine
             baselineEffect={selectedClaim.stressDefaults.baselineEffect}
             sampleSize={sampleSize}
@@ -238,7 +210,6 @@ export function LabPage({
             onReset={handleResetStressTest}
           />
 
-          {/* Student 3 Questions Before You Cite This */}
           <CitationChecklist
             claimId={selectedClaim.id}
             items={selectedClaim.checklist}

@@ -2,22 +2,19 @@
 
 @layer base {
   :root {
-    --bg-obsidian: #0B0C0E;
-    --bg-carbon: #13151A;
-    --bg-elevated: #1C1F26;
-    --border-hairline: rgba(255, 255, 255, 0.08);
-    --text-primary: #F8FAFC;
-    --text-muted: #94A3B8;
-    --accent-cobalt: #2563EB;
-    --accent-verified: #10B981;
-    --accent-disputed: #F43F5E;
-    --accent-differ: #F59E0B;
+    --bg-ground: #FFFFFF;
+    --bg-subtle: #FAFAFA;
+    --bg-muted: #F4F4F5;
+    --border-line: #E4E4E7;
+    --text-primary: #09090B;
+    --text-muted: #52525B;
   }
 
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #0B0C0E;
-    color: #F8FAFC;
+    background-color: #FFFFFF;
+    color: #09090B;
+    -webkit-font-smoothing: antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
@@ -38,27 +35,26 @@
 .a11y-hyperlegible span,
 .a11y-hyperlegible li,
 .a11y-hyperlegible label {
-  line-height: 1.65;
+  line-height: 1.68;
   letter-spacing: 0.015em;
 }
 
 .a11y-hyperlegible .hairline-card {
-  border-color: rgba(255, 255, 255, 0.24) !important;
+  border-color: #09090B !important;
 }
 
 .a11y-hyperlegible .text-muted-token {
-  color: #CBD5E1 !important;
+  color: #18181B !important;
 }
 
-/* Custom sleek range input for Statistical Stress-Test Engine */
+/* Clean editorial range input */
 input[type="range"].proof-slider {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 6px;
+  height: 5px;
   border-radius: 9999px;
-  background: #1C1F26;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #E4E4E7;
   outline: none;
   cursor: pointer;
 }
@@ -69,23 +65,22 @@ input[type="range"].proof-slider::-webkit-slider-thumb {
   width: 18px;
   height: 18px;
   border-radius: 9999px;
-  background: #2563EB;
-  border: 2px solid #F8FAFC;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  background: #09090B;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
+  transition: transform 0.12s ease;
 }
 
 input[type="range"].proof-slider::-webkit-slider-thumb:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.35);
 }
 
 input[type="range"].proof-slider::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 9999px;
-  background: #2563EB;
-  border: 2px solid #F8FAFC;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+  background: #09090B;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
   cursor: pointer;
 }

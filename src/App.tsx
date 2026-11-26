@@ -78,7 +78,7 @@ export function App() {
 
   return (
     <div
-      className={`min-h-screen bg-[#0B0C0E] text-[#F8FAFC] ${
+      className={`min-h-screen bg-white text-zinc-950 ${
         hyperlegible ? 'a11y-hyperlegible' : ''
       }`}
     >
@@ -104,9 +104,9 @@ export function App() {
         />
       )}
 
-      <footer className="border-t border-white/[0.06] bg-[#0B0C0E] py-6 text-center text-xs text-[#94A3B8]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          ProofLine · Built for the 2026 STEM Innovation Challenge · Paper Theme UI
+      <footer className="border-t border-zinc-200 bg-white py-8 text-center text-xs text-zinc-500">
+        <div className="mx-auto max-w-6xl px-6">
+          ProofLine · Built for the 2026 STEM Innovation Challenge
         </div>
       </footer>
     </div>
